@@ -33,10 +33,7 @@ var rootCmd = &cobra.Command{
 	Short: "Generates Yaml for Kubernetes Resources",
 	Long: `Generates Yaml for Kubernetes resources. It will make use of flags to create multiple resources together. 
 	Example: jish generate deployment jish-deployment --type=simple --resource=all
-	This command will create a deployment with a simple template and will also generate a configmap, secret, and, service specification`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	This command will create a deployment with a simple template and will also generate a configmap, secret, and, service specifications that are linked to the deployment`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
