@@ -29,7 +29,7 @@ var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "jish",
+	Use:   "jish-cli",
 	Short: "Generates Yaml for Kubernetes Resources",
 	Long: `Generates Yaml for Kubernetes resources. It will make use of flags to create multiple resources together. 
 	Example: jish generate deployment jish-deployment --type=simple --resource=all

@@ -24,17 +24,43 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var configMap bool
-var secret bool
-var service bool
-var all bool
-var mode string
-
-func createDeploymentYaml(args []string) {
+func createDeploymentYaml(cmd *cobra.Command, args []string) {
+	configMap, configErr := cmd.Flags().GetString("configmap")
+	if configErr != nil {
+		log.Fatalf(configErr.Error())
+	}
+	secret, secretErr := cmd.Flags().GetString("secret")
+	if secretErr != nil {
+		log.Fatalf(secretErr.Error())
+	}
+	service, serviceErr := cmd.Flags().GetString("service")
+	if serviceErr != nil {
+		log.Fatalf(serviceErr.Error())
+	}
+	mode, modeErr := cmd.Flags().GetString("mode")
+	if modeErr != nil {
+		log.Fatalf(modeErr.Error())
+	}
 
 	name := args[0]
+	var newDeploy *templates.SimpleDeployment
 
-	newDeploy := templates.CreateSimpleDeploymentYaml(name, "", "")
+	switch mode {
+
+	case "simple":
+		fmt.Printf("Creating Simple Deployment...\n\n\n")
+		newDeploy = templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
+	case "standard":
+		fmt.Println("Creating Standard Deployment...\n\n\n")
+		newDeploy = templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
+	case "complex":
+		fmt.Println("Creating Complex Deployment...\n\n\n")
+		newDeploy = templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
+	default:
+		fmt.Println("Creating Simple Default Deployment...\n\n\n")
+		newDeploy = templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
+
+	}
 
 	newYaml, err := yaml.Marshal(newDeploy)
 
@@ -47,13 +73,13 @@ func createDeploymentYaml(args []string) {
 
 // deploymentCmd represents the deployment command
 var deploymentCmd = &cobra.Command{
-	Use:   "deployment",
+	Use:   "deployment <name>",
 	Short: "create a deployment yaml file",
 	Long: `create a deployment yaml file with the given name. This will have 3 different mode flags: simple, standard, complex. 
 	There are 3 additional flags to create a configmap, secret, and service that are automatically added to the yaml`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("deployment called")
-		createDeploymentYaml(args)
+		createDeploymentYaml(cmd, args)
 	},
 }
 
@@ -63,5 +89,6 @@ func init() {
 	deploymentCmd.Flags().String("configmap", "", "Create a configmap. takes the value of either env or mount to determine how to set up the template")
 	deploymentCmd.Flags().String("secret", "", "Create a Secret. takes the value of either env or mount to determine how to set up the template")
 	deploymentCmd.Flags().String("service", "", "Create a service. takes the value of either clusterip, nodeport,loadbalancer, or externalname to determine how to set up the template")
+	deploymentCmd.Flags().String("mode", "", "Determines the verboseness of the yaml file. ")
 
 }
