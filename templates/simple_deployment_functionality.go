@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const deploymentApiVersion, deploymentKind, image, envKey string = "apps/v1", "Deployment", "<image:tag>", "<key>"
+const deploymentAPIVersion, deploymentKind, image, envKey string = "apps/v1", "Deployment", "<image:tag>", "<key>"
 const replicas, containerPort int = 3, 80
 const mountPath string = "/"
 
@@ -215,7 +215,7 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 
 	simpleDeployment := &simpleDeployment{}
 
-	simpleDeployment.ApiVersion = deploymentApiVersion
+	simpleDeployment.ApiVersion = deploymentAPIVersion
 	simpleDeployment.Kind = deploymentKind
 	simpleDeployment.Spec.Replicas = replicas
 	simpleDeployment.Metadata.Labels.App = name
