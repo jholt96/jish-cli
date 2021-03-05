@@ -2,6 +2,7 @@ package templates
 
 import (
 	"fmt"
+	"io/ioutil"
 
 	"gopkg.in/yaml.v2"
 )
@@ -323,6 +324,11 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 		fmt.Printf(err.Error())
 	}
 
-	fmt.Print(string(newDeploymentYaml))
-	fmt.Print("\n\n")
+	writeFileErr := ioutil.WriteFile((name + "-deployment.yaml"), newDeploymentYaml, 0755)
+
+	if writeFileErr != nil {
+		fmt.Printf(writeFileErr.Error())
+	} else {
+		fmt.Printf("%s-deployment.yaml has been created in the current directory\n", name)
+	}
 }

@@ -2,6 +2,7 @@ package templates
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 
 	"gopkg.in/yaml.v2"
@@ -28,8 +29,13 @@ func CreateConfigMap(name string) {
 		log.Fatal(err.Error())
 	}
 
-	fmt.Print(string(newConfigMapYaml))
-	fmt.Print("\n\n")
+	writeFileErr := ioutil.WriteFile((name + ".yaml"), newConfigMapYaml, 0755)
+
+	if writeFileErr != nil {
+		fmt.Printf(writeFileErr.Error())
+	} else {
+		fmt.Printf("%s.yaml has been created in the current directory\n", name)
+	}
 }
 
 func CreateSecret(name string) {
@@ -52,6 +58,11 @@ func CreateSecret(name string) {
 		log.Fatal(err.Error())
 	}
 
-	fmt.Print(string(newSecretYaml))
-	fmt.Print("\n\n")
+	writeFileErr := ioutil.WriteFile((name + ".yaml"), newSecretYaml, 0755)
+
+	if writeFileErr != nil {
+		fmt.Printf(writeFileErr.Error())
+	} else {
+		fmt.Printf("%s.yaml has been created in the current directory\n", name)
+	}
 }

@@ -63,7 +63,6 @@ func createDeploymentYaml(configMap, secret, service, mode, name string) {
 		templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
 	default:
 		templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
-
 	}
 }
 
