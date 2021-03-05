@@ -1,20 +1,20 @@
 package templates
 
-type SecretEnvValueFrom struct {
+type secretEnvValueFrom struct {
 	SecretKeyRef struct {
 		Name string `yaml:"name"`
 		Key  string `yaml:"key"`
 	} `yaml:"secretKeyRef"`
 }
 
-type SecretMount struct {
+type secretMountVolume struct {
 	Name   string `yaml:"name"`
 	Secret struct {
 		SecretName string `yaml:"secretName"`
 	} `yaml:"secret"`
 }
 
-type Secret struct {
+type secret struct {
 	ApiVersion string `yaml:"apiVersion"`
 	Kind       string `yaml:"kind"`
 	Metadata   struct {

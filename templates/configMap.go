@@ -1,20 +1,24 @@
+/*
+All structs must be exported
+*/
+
 package templates
 
-type ConfigEnvValueFrom struct {
+type configEnvValueFrom struct {
 	ConfigMapKeyRef struct {
 		Name string `yaml:"name"`
 		Key  string `yaml:"key"`
 	} `yaml:"configMapKeyRef"`
 }
 
-type ConfigMount struct {
+type configMountVolume struct {
 	Name      string `yaml:"name"`
 	ConfigMap struct {
 		Name string `yaml:"name"`
 	} `yaml:"configMap"`
 }
 
-type ConfigMap struct {
+type configMap struct {
 	ApiVersion string `yaml:"apiVersion"`
 	Kind       string `yaml:"kind"`
 	Metadata   struct {

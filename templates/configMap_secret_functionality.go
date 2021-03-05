@@ -12,11 +12,16 @@ const secretAPIVersion, configMapAPIVersion, namespace string = "v1", "v1", "<na
 const configMapKind, secretKind, secretType string = "ConfigMap", "Secret", "Opaque"
 const username, password, exampleData string = "user", "Pass", "world"
 
+/*
+creates the configmap template from the struct
+It then converts the struct into yaml
+Lastly it writes it to a yaml file using the naming convention of <name>-configmap.yaml
+*/
 func CreateConfigMap(name string) {
 
 	fmt.Printf("Creating ConfigMap...\n\n")
 
-	configMap := &ConfigMap{}
+	configMap := &configMap{}
 
 	configMap.ApiVersion = configMapAPIVersion
 	configMap.Kind = configMapKind
@@ -38,11 +43,16 @@ func CreateConfigMap(name string) {
 	}
 }
 
+/*
+creates the secret template from the struct
+It then converts the struct into yaml
+Lastly it writes it to a yaml file using the naming convention of <name>-secret.yaml
+*/
 func CreateSecret(name string) {
 
 	fmt.Printf("Creating Secret...\n\n")
 
-	secret := &Secret{}
+	secret := &secret{}
 
 	secret.ApiVersion = secretAPIVersion
 	secret.Kind = secretKind

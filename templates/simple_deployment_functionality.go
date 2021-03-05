@@ -11,8 +11,8 @@ const deploymentApiVersion, deploymentKind, image, envKey string = "apps/v1", "D
 const replicas, containerPort int = 3, 80
 const mountPath string = "/"
 
-func createSimpleSpecBase(name string) SimpleSpec {
-	simpleSpec := SimpleSpec{}
+func createSimpleSpecBase(name string) simpleSpec {
+	simpleSpec := simpleSpec{}
 
 	simpleSpec.Containers = make([]struct {
 		Name  string "yaml:\"name\""
@@ -33,8 +33,8 @@ func createSimpleSpecBase(name string) SimpleSpec {
 	return simpleSpec
 }
 
-func createSimpleSpecEnv(name string, envName []string, numOfEnv int, valueFrom ...interface{}) *SimpleSpecEnv {
-	simpleSpecEnv := &SimpleSpecEnv{}
+func createSimpleSpecEnv(name string, envName []string, numOfEnv int, valueFrom ...interface{}) *simpleSpecEnv {
+	simpleSpecEnv := &simpleSpecEnv{}
 
 	simpleSpecEnv.Containers = make([]struct {
 		Name  string "yaml:\"name\""
@@ -71,9 +71,9 @@ func createSimpleSpecEnv(name string, envName []string, numOfEnv int, valueFrom 
 
 }
 
-func createSimpleSpecMount(name string, envName []string, numOfVolumes int, volumeMount ...interface{}) *SimpleSpecMount {
+func createSimpleSpecMount(name string, envName []string, numOfVolumes int, volumeMount ...interface{}) *simpleSpecMount {
 
-	simpleSpecMount := &SimpleSpecMount{}
+	simpleSpecMount := &simpleSpecMount{}
 
 	simpleSpecMount.Containers = make([]struct {
 		Name  string "yaml:\"name\""
@@ -114,8 +114,8 @@ func createSimpleSpecMount(name string, envName []string, numOfVolumes int, volu
 	return simpleSpecMount
 }
 
-func createSimpleEnvandMount(name string, envMountEnvName []string, volumeMount interface{}, envValueFrom interface{}) *SimpleSpecEnvmount {
-	simpleSpecEnvmount := &SimpleSpecEnvmount{}
+func createSimpleEnvandMount(name string, envMountEnvName []string, volumeMount interface{}, envValueFrom interface{}) *simpleSpecEnvmount {
+	simpleSpecEnvmount := &simpleSpecEnvmount{}
 
 	simpleSpecEnvmount.Containers = make([]struct {
 		Name  string "yaml:\"name\""
@@ -213,7 +213,7 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 		}
 	*/
 
-	simpleDeployment := &SimpleDeployment{}
+	simpleDeployment := &simpleDeployment{}
 
 	simpleDeployment.ApiVersion = deploymentApiVersion
 	simpleDeployment.Kind = deploymentKind
@@ -229,7 +229,7 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 
 	} else if configEnv && !configMount && !secretEnv && !secretMount { //if only configmap with env is set
 		envName := []string{name + "-configmap"}
-		valueFrom := &ConfigEnvValueFrom{}
+		valueFrom := &configEnvValueFrom{}
 		valueFrom.ConfigMapKeyRef.Key = envKey
 		valueFrom.ConfigMapKeyRef.Name = envName[0]
 
@@ -237,7 +237,7 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 
 	} else if !configEnv && configMount && !secretEnv && !secretMount { //if only configmap with volume mount is set
 		envName := []string{name + "-configmap"}
-		configVolume := ConfigMount{}
+		configVolume := configMountVolume{}
 
 		configVolume.Name = envName[0]
 		configVolume.ConfigMap.Name = envName[0]
@@ -246,7 +246,7 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 
 	} else if !configEnv && !configMount && secretEnv && !secretMount { //if only secret with env is set
 		envName := []string{name + "-secret"}
-		valueFrom := &SecretEnvValueFrom{}
+		valueFrom := &secretEnvValueFrom{}
 		valueFrom.SecretKeyRef.Name = envName[0]
 		valueFrom.SecretKeyRef.Key = envName[0] + "-key"
 
@@ -254,7 +254,7 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 
 	} else if !configEnv && !configMount && !secretEnv && secretMount { //if only secret with volume mount is set
 		envName := []string{name + "-secret"}
-		SecretVolume := SecretMount{}
+		SecretVolume := secretMountVolume{}
 
 		SecretVolume.Name = envName[0]
 		SecretVolume.Secret.SecretName = envName[0]
@@ -265,11 +265,11 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 
 		envName := []string{name + "-secret", name + "-configmap"}
 
-		valueFromSecret := &SecretEnvValueFrom{}
+		valueFromSecret := &secretEnvValueFrom{}
 		valueFromSecret.SecretKeyRef.Name = envName[0]
 		valueFromSecret.SecretKeyRef.Key = envName[0] + "-key"
 
-		valueFromConfig := &ConfigEnvValueFrom{}
+		valueFromConfig := &configEnvValueFrom{}
 		valueFromConfig.ConfigMapKeyRef.Key = envKey
 		valueFromConfig.ConfigMapKeyRef.Name = envName[1]
 
@@ -278,11 +278,11 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 	} else if configEnv && !configMount && !secretEnv && secretMount { //if configmap with env and secret with mount
 		envName := []string{name + "-configmap", name + "-secret"}
 
-		valueFromConfig := &ConfigEnvValueFrom{}
+		valueFromConfig := &configEnvValueFrom{}
 		valueFromConfig.ConfigMapKeyRef.Key = envKey
 		valueFromConfig.ConfigMapKeyRef.Name = envName[1]
 
-		SecretVolume := SecretMount{}
+		SecretVolume := secretMountVolume{}
 		SecretVolume.Name = envName[0]
 		SecretVolume.Secret.SecretName = envName[0]
 
@@ -291,11 +291,11 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 	} else if !configEnv && configMount && secretEnv && !secretMount { //if configmap with mount and secret with env
 		envName := []string{name + "-secret", name + "-configmap"}
 
-		valueFromSecret := &SecretEnvValueFrom{}
+		valueFromSecret := &secretEnvValueFrom{}
 		valueFromSecret.SecretKeyRef.Name = envName[0]
 		valueFromSecret.SecretKeyRef.Key = envName[0] + "-key"
 
-		configVolume := ConfigMount{}
+		configVolume := configMountVolume{}
 		configVolume.Name = envName[1]
 		configVolume.ConfigMap.Name = envName[1]
 
@@ -304,11 +304,11 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 	} else if !configEnv && configMount && !secretEnv && secretMount { //if configmap with mount and secret with mount
 		envName := []string{name + "-secret", name + "-configmap"}
 
-		SecretVolume := SecretMount{}
+		SecretVolume := secretMountVolume{}
 		SecretVolume.Name = envName[0]
 		SecretVolume.Secret.SecretName = envName[0]
 
-		configVolume := ConfigMount{}
+		configVolume := configMountVolume{}
 		configVolume.Name = envName[1]
 		configVolume.ConfigMap.Name = envName[1]
 

@@ -1,6 +1,6 @@
 package templates
 
-type SimpleSpec struct {
+type simpleSpec struct {
 	Containers []struct {
 		Name  string `yaml:"name"`
 		Image string `yaml:"image"`
@@ -10,7 +10,7 @@ type SimpleSpec struct {
 	} `yaml:"containers"`
 }
 
-type SimpleSpecEnv struct {
+type simpleSpecEnv struct {
 	Containers []struct {
 		Name  string `yaml:"name"`
 		Image string `yaml:"image"`
@@ -24,7 +24,7 @@ type SimpleSpecEnv struct {
 	} `yaml:"containers"`
 }
 
-type SimpleSpecMount struct {
+type simpleSpecMount struct {
 	Containers []struct {
 		Name  string `yaml:"name"`
 		Image string `yaml:"image"`
@@ -39,7 +39,7 @@ type SimpleSpecMount struct {
 	Volumes []interface{} `yaml:"volumes"`
 }
 
-type SimpleSpecEnvmount struct {
+type simpleSpecEnvmount struct {
 	Containers []struct {
 		Name  string `yaml:"name"`
 		Image string `yaml:"image"`
@@ -58,7 +58,7 @@ type SimpleSpecEnvmount struct {
 	Volumes []interface{} `yaml:"volumes"`
 }
 
-type SimpleDeployment struct {
+type simpleDeployment struct {
 	ApiVersion string `yaml:"apiVersion"`
 	Kind       string `yaml:"kind"`
 	Metadata   struct {
