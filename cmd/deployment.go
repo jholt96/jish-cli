@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Copyright © 2021 Josh Holt jholt96@live.com
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,15 +16,13 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	templates "github.com/jholt96/jish-cli/templates"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v2"
 )
 
-func createDeploymentYaml(cmd *cobra.Command, args []string) {
+func getFlagsandArgs(cmd *cobra.Command, args []string) (string, string, string, string, string) {
 	configMap, configErr := cmd.Flags().GetString("configmap")
 	if configErr != nil {
 		log.Fatalf(configErr.Error())
@@ -43,32 +41,30 @@ func createDeploymentYaml(cmd *cobra.Command, args []string) {
 	}
 
 	name := args[0]
-	var newDeploy *templates.SimpleDeployment
+
+	return configMap, secret, service, mode, name
+}
+
+func createDeploymentYaml(configMap, secret, service, mode, name string) {
+
+	if secret != "" {
+		templates.CreateSecret((name + "-secret"))
+	}
+	if configMap != "" {
+		templates.CreateConfigMap((name + "-configmap"))
+	}
 
 	switch mode {
-
 	case "simple":
-		fmt.Printf("Creating Simple Deployment...\n\n\n")
-		newDeploy = templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
+		templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
 	case "standard":
-		fmt.Println("Creating Standard Deployment...\n\n\n")
-		newDeploy = templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
+		templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
 	case "complex":
-		fmt.Println("Creating Complex Deployment...\n\n\n")
-		newDeploy = templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
+		templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
 	default:
-		fmt.Println("Creating Simple Default Deployment...\n\n\n")
-		newDeploy = templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
+		templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
 
 	}
-
-	newYaml, err := yaml.Marshal(newDeploy)
-
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	fmt.Print(string(newYaml))
 }
 
 // deploymentCmd represents the deployment command
@@ -79,7 +75,9 @@ var deploymentCmd = &cobra.Command{
 	There are 3 additional flags to create a configmap, secret, and service that are automatically added to the yaml`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		createDeploymentYaml(cmd, args)
+		configMap, secret, service, mode, name := getFlagsandArgs(cmd, args)
+
+		createDeploymentYaml(configMap, secret, service, mode, name)
 	},
 }
 

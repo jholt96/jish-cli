@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 Josh Holt jholt96@live.com
+Copyright © 2021 NAME HERE <EMAIL ADDRESS>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,12 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package main
+package cmd
 
 import (
-	"github.com/jholt96/jish-cli/cmd"
+	"github.com/jholt96/jish-cli/templates"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	cmd.Execute()
+// secretCmd represents the secret command
+var secretCmd = &cobra.Command{
+	Use:   "secret <name>",
+	Short: "Generates a Secret",
+	Long:  `Generates an opaque secret to be used with kubectl `,
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		templates.CreateSecret(args[0])
+	},
+}
+
+func init() {
+	generateCmd.AddCommand(secretCmd)
 }
