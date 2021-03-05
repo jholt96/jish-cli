@@ -8,9 +8,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const secretAPIVersion, configMapAPIVersion, namespace string = "v1", "v1", "<namespace>"
-const configMapKind, secretKind, secretType string = "ConfigMap", "Secret", "Opaque"
+const secretAPIVersion, configMapAPIVersion, serviceAPIVersion, namespace string = "v1", "v1", "v1", "<namespace>"
+const configMapKind, secretKind, secretType, serviceKind string = "ConfigMap", "Secret", "Opaque", "Service"
 const username, password, exampleData string = "user", "Pass", "world"
+const port, targetPort, nodePort int = 80, 80, 8080
 
 /*
 creates the configmap template from the struct
@@ -75,4 +76,37 @@ func CreateSecret(name string) {
 	} else {
 		fmt.Printf("%s.yaml has been created in the current directory\n", name)
 	}
+}
+
+func CreatService(deploymentName string, serviceName, typeOfService string) {
+	fmt.Printf("Creating Secret...\n\n")
+
+	service := &service{}
+
+	service.APIVersion = serviceAPIVersion
+	service.Kind = serviceKind
+	service.Metadata.Name = serviceName
+	service.Metadata.Namespace = namespace
+	service.Spec.Ports = make([]struct {
+		Port       int "yaml:\"port\""
+		TargetPort int "yaml:\"targetPort\""
+	}, 1)
+
+	service.Spec.Selector.App = deploymentName
+
+	service.Spec.Ports[0].Port = port
+	service.Spec.Ports[0].TargetPort = targetPort
+
+	newServiceYaml, err := yaml.Marshal(service)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	writeFileErr := ioutil.WriteFile((serviceName + ".yaml"), newServiceYaml, 0755)
+
+	if writeFileErr != nil {
+		fmt.Printf(writeFileErr.Error())
+	} else {
+		fmt.Printf("%s.yaml has been created in the current directory\n", serviceName)
+	}
+
 }
