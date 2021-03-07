@@ -1,9 +1,11 @@
 package templates
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -18,6 +20,18 @@ creates the configmap template from the struct
 It then converts the struct into yaml
 Lastly it writes it to a yaml file using the naming convention of <name>-configmap.yaml
 */
+func ValidateFlagValue(flag string, flagPassed string, possibleValues []string) (string, error) {
+
+	for _, val := range possibleValues {
+		if strings.ToLower(flagPassed) == strings.ToLower(val) {
+			return flagPassed, nil
+		}
+	}
+
+	return "", errors.New(("Incorrect value for flag: " + flag))
+}
+
+/*Creates a configmap template using the name used in the arg*/
 func CreateConfigMap(name string) {
 
 	fmt.Printf("Creating ConfigMap...\n\n")
@@ -79,7 +93,7 @@ func CreateSecret(name string) {
 }
 
 func CreatService(deploymentName string, serviceName, typeOfService string) {
-	fmt.Printf("Creating Secret...\n\n")
+	fmt.Printf("Creating Service...\n\n")
 
 	service := &service{}
 
@@ -96,6 +110,7 @@ func CreatService(deploymentName string, serviceName, typeOfService string) {
 
 	service.Spec.Ports[0].Port = port
 	service.Spec.Ports[0].TargetPort = targetPort
+	service.Spec.Type = typeOfService
 
 	newServiceYaml, err := yaml.Marshal(service)
 	if err != nil {

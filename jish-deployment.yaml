@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jish
+  namespace: <namespace>
+  labels:
+    app: jish
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: jish
+  template:
+    metadata:
+      labels:
+        app: jish
+    spec:
+      containers:
+      - name: jish-container
+        image: <image:tag>
+        ports:
+        - containerPort: 80

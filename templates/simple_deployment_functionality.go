@@ -167,10 +167,8 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 
 	fmt.Printf("Creating Simple Deployment...\n\n\n")
 
-	configMount := false
-	configEnv := false
-	secretMount := false
-	secretEnv := false
+	configMount, configEnv := false, false
+	secretMount, secretEnv := false, false
 
 	switch configMap {
 	case "":
@@ -197,21 +195,6 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 		secretMount = false
 		secretEnv = false
 	}
-
-	/*
-		switch service {
-		case "":
-			configMount = false
-			configEnv = false
-		case "env":
-			configEnv = true
-		case "mount":
-			configMount = true
-		default:
-			configMount = false
-			configEnv = false
-		}
-	*/
 
 	simpleDeployment := &simpleDeployment{}
 

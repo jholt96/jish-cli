@@ -17,27 +17,58 @@ package cmd
 
 import (
 	"log"
+	"strings"
 
 	templates "github.com/jholt96/jish-cli/templates"
 	"github.com/spf13/cobra"
 )
+
+var configMapVals = []string{"env", "val", ""}
+var secretVals = []string{"env", "val", ""}
+var serviceVals = []string{"clusterip", "loadbalancer", "nodeport", ""}
+var modeVals = []string{"simple", "standard", "complex", ""}
 
 func getFlagsandArgs(cmd *cobra.Command, args []string) (string, string, string, string, string) {
 	configMap, configErr := cmd.Flags().GetString("configmap")
 	if configErr != nil {
 		log.Fatalf(configErr.Error())
 	}
+
+	_, err := templates.ValidateFlagValue("configmap", configMap, configMapVals)
+
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
 	secret, secretErr := cmd.Flags().GetString("secret")
 	if secretErr != nil {
 		log.Fatalf(secretErr.Error())
+	}
+	_, err = templates.ValidateFlagValue("secret", secret, secretVals)
+
+	if err != nil {
+		log.Fatalf(err.Error())
 	}
 	service, serviceErr := cmd.Flags().GetString("service")
 	if serviceErr != nil {
 		log.Fatalf(serviceErr.Error())
 	}
+
+	_, err = templates.ValidateFlagValue("service", service, serviceVals)
+
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+
 	mode, modeErr := cmd.Flags().GetString("mode")
 	if modeErr != nil {
 		log.Fatalf(modeErr.Error())
+	}
+
+	_, err = templates.ValidateFlagValue("mode", mode, modeVals)
+
+	if err != nil {
+		log.Fatalf(err.Error())
 	}
 
 	name := args[0]
@@ -52,6 +83,23 @@ func createDeploymentYaml(configMap, secret, service, mode, name string) {
 	}
 	if configMap != "" {
 		templates.CreateConfigMap((name + "-configmap"))
+	}
+
+	if service != "" {
+
+		serviceType := ""
+
+		switch strings.ToLower(service) {
+		case "clusterip":
+			serviceType = "ClusterIP"
+		case "nodeport":
+			serviceType = "NodePort"
+		case "loadbalancer":
+			serviceType = "LoadBalancer"
+		default:
+			serviceType = "ClusterIP"
+		}
+		templates.CreatService(name, name+"-service", serviceType)
 	}
 
 	switch mode {
