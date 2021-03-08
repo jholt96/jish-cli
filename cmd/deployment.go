@@ -23,18 +23,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var configMapVals = []string{"env", "val", ""}
-var secretVals = []string{"env", "val", ""}
-var serviceVals = []string{"clusterip", "loadbalancer", "nodeport", ""}
-var modeVals = []string{"simple", "standard", "complex", ""}
-
 func getFlagsandArgs(cmd *cobra.Command, args []string) (string, string, string, string, string) {
 	configMap, configErr := cmd.Flags().GetString("configmap")
 	if configErr != nil {
 		log.Fatalf(configErr.Error())
 	}
 
-	_, err := templates.ValidateFlagValue("configmap", configMap, configMapVals)
+	_, err := templates.ValidateFlagValue("configmap", configMap)
 
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -44,7 +39,7 @@ func getFlagsandArgs(cmd *cobra.Command, args []string) (string, string, string,
 	if secretErr != nil {
 		log.Fatalf(secretErr.Error())
 	}
-	_, err = templates.ValidateFlagValue("secret", secret, secretVals)
+	_, err = templates.ValidateFlagValue("secret", secret)
 
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -54,7 +49,7 @@ func getFlagsandArgs(cmd *cobra.Command, args []string) (string, string, string,
 		log.Fatalf(serviceErr.Error())
 	}
 
-	_, err = templates.ValidateFlagValue("service", service, serviceVals)
+	_, err = templates.ValidateFlagValue("service", service)
 
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -65,7 +60,7 @@ func getFlagsandArgs(cmd *cobra.Command, args []string) (string, string, string,
 		log.Fatalf(modeErr.Error())
 	}
 
-	_, err = templates.ValidateFlagValue("mode", mode, modeVals)
+	_, err = templates.ValidateFlagValue("mode", mode)
 
 	if err != nil {
 		log.Fatalf(err.Error())
@@ -77,15 +72,21 @@ func getFlagsandArgs(cmd *cobra.Command, args []string) (string, string, string,
 }
 
 func createDeploymentYaml(configMap, secret, service, mode, name string) {
+	count := 0
+
+	fileChannel := make(chan string, 1)
 
 	if secret != "" {
-		templates.CreateSecret((name + "-secret"))
+		count++
+		go templates.CreateSecret((name + "-secret"), fileChannel)
 	}
 	if configMap != "" {
-		templates.CreateConfigMap((name + "-configmap"))
+		count++
+		go templates.CreateConfigMap((name + "-configmap"), fileChannel)
 	}
 
 	if service != "" {
+		count++
 
 		serviceType := ""
 
@@ -99,19 +100,26 @@ func createDeploymentYaml(configMap, secret, service, mode, name string) {
 		default:
 			serviceType = "ClusterIP"
 		}
-		templates.CreatService(name, name+"-service", serviceType)
+		go templates.CreatService(name, serviceType, fileChannel)
 	}
 
+	count++
 	switch mode {
 	case "simple":
-		templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
+		go templates.CreateSimpleDeploymentYaml(name, configMap, secret, service, fileChannel)
 	case "standard":
-		templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
+		go templates.CreateStandardDeploymentYaml(name, configMap, secret, service, fileChannel)
 	case "complex":
-		templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
+		go templates.CreateSimpleDeploymentYaml(name, configMap, secret, service, fileChannel)
 	default:
-		templates.CreateSimpleDeploymentYaml(name, configMap, secret, service)
+		go templates.CreateStandardDeploymentYaml(name, configMap, secret, service, fileChannel)
 	}
+
+	for i := 0; i < count; i++ {
+		println(<-fileChannel)
+	}
+
+	close(fileChannel)
 }
 
 // deploymentCmd represents the deployment command

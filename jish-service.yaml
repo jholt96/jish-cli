@@ -4,7 +4,7 @@ metadata:
   name: jish-service
   namespace: <namespace>
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: jish
   ports:

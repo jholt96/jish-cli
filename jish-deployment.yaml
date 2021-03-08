@@ -5,12 +5,20 @@ metadata:
   namespace: <namespace>
   labels:
     app: jish
+  annotations:
+    key: Deployment
 spec:
   replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
   selector:
     matchLabels:
       app: jish
   template:
+    imagePullSecrets: []
     metadata:
       labels:
         app: jish
@@ -18,5 +26,23 @@ spec:
       containers:
       - name: jish-container
         image: <image:tag>
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 1000m
+            memory: 1000Mi
+        env:
+        - name: jish-configmap
+          valueFrom:
+            configMapKeyRef:
+              name: jish-configmap
+              key: <key>
+        volumeMounts:
+        - name: jish
+          mountPath: /
+      volumes: []

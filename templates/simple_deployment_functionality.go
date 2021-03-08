@@ -7,10 +7,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const deploymentAPIVersion, deploymentKind, image, envKey string = "apps/v1", "Deployment", "<image:tag>", "<key>"
-const replicas, containerPort int = 3, 80
-const mountPath string = "/"
-
 func createSimpleSpecBase(name string) simpleSpec {
 	simpleSpec := simpleSpec{}
 
@@ -163,7 +159,7 @@ func createSimpleEnvandMount(name string, envMountEnvName []string, volumeMount 
 	return simpleSpecEnvmount
 }
 
-func CreateSimpleDeploymentYaml(name string, configMap string, secret string, service string) {
+func CreateSimpleDeploymentYaml(name, configMap, secret, service string, ch chan<- string) {
 
 	fmt.Printf("Creating Simple Deployment...\n\n\n")
 
@@ -310,8 +306,8 @@ func CreateSimpleDeploymentYaml(name string, configMap string, secret string, se
 	writeFileErr := ioutil.WriteFile((name + "-deployment.yaml"), newDeploymentYaml, 0755)
 
 	if writeFileErr != nil {
-		fmt.Printf(writeFileErr.Error())
+		ch <- writeFileErr.Error()
 	} else {
-		fmt.Printf("%s-deployment.yaml has been created in the current directory\n", name)
+		ch <- (name + "-deployment.yaml has been created in the current directory\n")
 	}
 }

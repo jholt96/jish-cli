@@ -1,36 +1,92 @@
 package templates
 
+type emtpyDir struct {
+	Name     string
+	EmptyDir struct{}
+}
+
 type standardSpec struct {
 	Containers []struct {
-		Name  string `yaml:"name"`
-		Image string `yaml:"image"`
-		Ports []struct {
+		Name            string `yaml:"name"`
+		Image           string `yaml:"image"`
+		ImagePullPolicy string `yaml:"imagePullPolicy"`
+		Ports           []struct {
 			ContainerPort int `yaml:"containerPort"`
 		} `yaml:"ports"`
+		Resources struct {
+			Requests struct {
+				CPU    string `yaml:"cpu"`
+				Memory string `yaml:"memory"`
+			} `yaml:"requests"`
+			Limits struct {
+				CPU    string `yaml:"cpu"`
+				Memory string `yaml:"memory"`
+			} `yaml:"limits"`
+		} `yaml:"resources"`
+		Env []struct {
+			Name  string `yaml:"name"`
+			Value string `yaml:"value"`
+		} `yaml:"env"`
+		VolumeMounts []struct {
+			Name      string `yaml:"name"`
+			MountPath string `yaml:"mountPath"`
+		} `yaml:"volumeMounts"`
 	} `yaml:"containers"`
+	Volumes []emtpyDir `yaml:"volumes"`
 }
 
 type standardSpecEnv struct {
 	Containers []struct {
-		Name  string `yaml:"name"`
-		Image string `yaml:"image"`
-		Ports []struct {
+		Name            string `yaml:"name"`
+		Image           string `yaml:"image"`
+		ImagePullPolicy string `yaml:"imagePullPolicy"`
+		Ports           []struct {
 			ContainerPort int `yaml:"containerPort"`
 		} `yaml:"ports"`
+		Resources struct {
+			Requests struct {
+				CPU    string `yaml:"cpu"`
+				Memory string `yaml:"memory"`
+			} `yaml:"requests"`
+			Limits struct {
+				CPU    string `yaml:"cpu"`
+				Memory string `yaml:"memory"`
+			} `yaml:"limits"`
+		} `yaml:"resources"`
 		Env []struct {
 			Name      string      `yaml:"name"`
 			ValueFrom interface{} `yaml:"valueFrom"`
 		} `yaml:"env"`
+		VolumeMounts []struct {
+			Name      string `yaml:"name"`
+			MountPath string `yaml:"mountPath"`
+		} `yaml:"volumeMounts"`
 	} `yaml:"containers"`
+	Volumes []emtpyDir `yaml:"volumes"`
 }
 
 type standardSpecMount struct {
 	Containers []struct {
-		Name  string `yaml:"name"`
-		Image string `yaml:"image"`
-		Ports []struct {
+		Name            string `yaml:"name"`
+		Image           string `yaml:"image"`
+		ImagePullPolicy string `yaml:"imagePullPolicy"`
+		Ports           []struct {
 			ContainerPort int `yaml:"containerPort"`
 		} `yaml:"ports"`
+		Resources struct {
+			Requests struct {
+				CPU    string `yaml:"cpu"`
+				Memory string `yaml:"memory"`
+			} `yaml:"requests"`
+			Limits struct {
+				CPU    string `yaml:"cpu"`
+				Memory string `yaml:"memory"`
+			} `yaml:"limits"`
+		} `yaml:"resources"`
+		Env []struct {
+			Name  string `yaml:"name"`
+			Value string `yaml:"value"`
+		} `yaml:"env"`
 		VolumeMounts []struct {
 			Name      string `yaml:"name"`
 			MountPath string `yaml:"mountPath"`
@@ -41,11 +97,22 @@ type standardSpecMount struct {
 
 type standardSpecEnvmount struct {
 	Containers []struct {
-		Name  string `yaml:"name"`
-		Image string `yaml:"image"`
-		Ports []struct {
+		Name            string `yaml:"name"`
+		Image           string `yaml:"image"`
+		ImagePullPolicy string `yaml:"imagePullPolicy"`
+		Ports           []struct {
 			ContainerPort int `yaml:"containerPort"`
 		} `yaml:"ports"`
+		Resources struct {
+			Requests struct {
+				CPU    string `yaml:"cpu"`
+				Memory string `yaml:"memory"`
+			} `yaml:"requests"`
+			Limits struct {
+				CPU    string `yaml:"cpu"`
+				Memory string `yaml:"memory"`
+			} `yaml:"limits"`
+		} `yaml:"resources"`
 		VolumeMounts []struct {
 			Name      string `yaml:"name"`
 			MountPath string `yaml:"mountPath"`
@@ -67,15 +134,29 @@ type standardDeployment struct {
 		Labels    struct {
 			App string `yaml:"app"`
 		} `yaml:"labels"`
+		Annotations struct {
+			Key string `yaml:"key"`
+		} `yaml:"annotations"`
 	} `yaml:"metadata"`
+
 	Spec struct {
 		Replicas int `yaml:"replicas"`
+		Strategy struct {
+			Type          string `yaml:"type"`
+			RollingUpdate struct {
+				MaxSurge       string `yaml:"maxSurge"`
+				MaxUnavailable string `yaml:"maxUnavailable"`
+			} `yaml:"rollingUpdate"`
+		} `yaml:"strategy"`
 		Selector struct {
 			MatchLabels struct {
 				App string `yaml:"app"`
 			} `yaml:"matchLabels"`
 		} `yaml:"selector"`
 		Template struct {
+			ImagePullSecrets []struct {
+				Name string `yaml:"name"`
+			} `yaml:"imagePullSecrets"`
 			Metadata struct {
 				Labels struct {
 					App string `yaml:"app"`

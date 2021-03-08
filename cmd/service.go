@@ -16,36 +16,65 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"log"
+	"strings"
 
+	"github.com/jholt96/jish-cli/templates"
 	"github.com/spf13/cobra"
 )
 
+func createNewService(name string, serviceFlag string) {
+
+	fileChannel := make(chan string, 1)
+
+	serviceType := ""
+
+	if serviceFlag != "" {
+
+		switch strings.ToLower(serviceFlag) {
+		case "clusterip":
+			serviceType = "ClusterIP"
+		case "nodeport":
+			serviceType = "NodePort"
+		case "loadbalancer":
+			serviceType = "LoadBalancer"
+		default:
+			serviceType = "ClusterIP"
+		}
+		go templates.CreatService(name, serviceType, fileChannel)
+	}
+
+	templates.CreatService(name, serviceType, fileChannel)
+
+	println(<-fileChannel)
+}
+
 // serviceCmd represents the service command
 var serviceCmd = &cobra.Command{
-	Use:   "service <name>",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Use:   "service <name> --type=<loadbalancer,clusterip,nodeport>",
+	Short: "creates a service using the name provided",
+	Long:  `Creates a service using the name provided. The default type will be clusterip but it can be changed using the 'type' flag`,
+	Args:  cobra.ExactArgs(1),
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("service called")
+
+		serviceType, err := cmd.Flags().GetString("type")
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+
+		_, err = templates.ValidateFlagValue("service", serviceType)
+
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+
+		createNewService(args[0], serviceType)
 	},
 }
 
 func init() {
 	generateCmd.AddCommand(serviceCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// serviceCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// serviceCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	serviceCmd.Flags().String("type", "ClusterIP", "Determines the type of service to be created. valid values are: clusterip, loadbalancer, and nodeport")
 }

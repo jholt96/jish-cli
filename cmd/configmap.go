@@ -16,9 +16,18 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/jholt96/jish-cli/templates"
+	templates "github.com/jholt96/jish-cli/templates"
 	"github.com/spf13/cobra"
 )
+
+func createNewConfigMap(name string) {
+
+	fileChannel := make(chan string, 1)
+
+	templates.CreateConfigMap(name, fileChannel)
+
+	println(<-fileChannel)
+}
 
 // configmapCmd represents the configmap command
 var configmapCmd = &cobra.Command{
@@ -27,7 +36,7 @@ var configmapCmd = &cobra.Command{
 	Long:  `Creates a base configMap that can be used with kubectl`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		templates.CreateConfigMap(args[0])
+		createNewConfigMap(args[0])
 	},
 }
 

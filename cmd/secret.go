@@ -16,9 +16,18 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/jholt96/jish-cli/templates"
+	templates "github.com/jholt96/jish-cli/templates"
 	"github.com/spf13/cobra"
 )
+
+func createNewSecret(name string) {
+
+	fileChannel := make(chan string, 1)
+
+	templates.CreateSecret(name, fileChannel)
+
+	println(<-fileChannel)
+}
 
 // secretCmd represents the secret command
 var secretCmd = &cobra.Command{
@@ -27,7 +36,7 @@ var secretCmd = &cobra.Command{
 	Long:  `Generates an opaque secret to be used with kubectl `,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		templates.CreateSecret(args[0])
+		createNewSecret(args[0])
 	},
 }
 
